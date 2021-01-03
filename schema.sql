@@ -6,24 +6,35 @@ CREATE TYPE pokemon_evolution_time_of_day AS ENUM (
     'night'
 );
 
-CREATE TABLE regions (
+CREATE TABLE languages (
     id integer PRIMARY KEY NOT NULL,
-    identifier text NOT NULL
-);
-
-CREATE TABLE generations (
-    id integer PRIMARY KEY NOT NULL,
-    main_region_id integer NOT NULL REFERENCES regions (id) ON DELETE CASCADE,
-    identifier text NOT NULL
+    iso639 integer NOT NULL,
+    iso3166 integer NOT NULL,
+    identifier text NOT NULL,
+    official boolean NOT NULL
 );
 
 CREATE TABLE pokemon_species (
     id integer PRIMARY KEY NOT NULL,
     identifier text NOT NULL,
-    generation_id integer NOT NULL REFERENCES generations (id) ON DELETE CASCADE,
     is_legendary boolean NOT NULL,
     is_mythical boolean NOT NULL,
     is_ultra_beast boolean NOT NULL
+);
+
+CREATE TABLE pokemon_species_names (
+    species_id integer NOT NULL REFERENCES pokemon_species (id) ON DELETE CASCADE,
+    language_id integer NOT NULL REFERENCES languages (id) ON DELETE CASCADE,
+    name text NOT NULL,
+    genus text NOT NULL,
+    PRIMARY KEY (species_id, language_id)
+);
+
+CREATE TABLE pokemon_species_flavor_text (
+    species_id integer NOT NULL REFERENCES pokemon_species (id) ON DELETE CASCADE,
+    language_id integer NOT NULL REFERENCES languages (id) ON DELETE CASCADE,
+    flavor_text text NOT NULL,
+    PRIMARY KEY (species_id, language_id)
 );
 
 CREATE TABLE pokemon (
@@ -35,6 +46,8 @@ CREATE TABLE pokemon (
     base_experience integer NOT NULL,
     is_default boolean NOT NULL
 );
+
+CREATE INDEX pokemon_species_id_idx ON pokemon (species_id);
 
 CREATE TABLE evolution_triggers (
     id integer PRIMARY KEY NOT NULL,
@@ -59,8 +72,7 @@ CREATE TABLE damage_classes (
 
 CREATE TABLE types (
     id integer PRIMARY KEY NOT NULL,
-    identifier text NOT NULL,
-    generation_id integer NOT NULL REFERENCES generations (id) ON DELETE CASCADE
+    identifier text NOT NULL
 );
 
 CREATE TABLE move_effects (
@@ -70,7 +82,6 @@ CREATE TABLE move_effects (
 CREATE TABLE moves (
     id integer PRIMARY KEY NOT NULL,
     identifier text NOT NULL,
-    generation_id integer NOT NULL REFERENCES generations (id) ON DELETE CASCADE,
     type_id integer NOT NULL REFERENCES types (id) ON DELETE CASCADE,
     power smallint NULL,
     pp smallint NULL,
@@ -95,9 +106,12 @@ CREATE TABLE pokemon_evolutions (
     minimum_happiness integer NULL
 );
 
+CREATE INDEX pokemon_evolutions_evolved_species_id_idx ON pokemon_evolutions (evolved_species_id);
+
 CREATE TABLE pokemon_types (
     pokemon_id integer NOT NULL REFERENCES pokemon (id) ON DELETE CASCADE,
-    type_id integer NOT NULL REFERENCES types (id) ON DELETE CASCADE
+    type_id integer NOT NULL REFERENCES types (id) ON DELETE CASCADE,
+    PRIMARY KEY (pokemon_id, type_id)
 );
 
 CREATE TABLE pokemon_forms (
@@ -110,6 +124,15 @@ CREATE TABLE pokemon_forms (
     enabled boolean NOT NULL,
     allow_catch boolean NOT NULL,
     allow_redeem boolean NOT NULL
+);
+
+CREATE INDEX pokemon_forms_pokemon_id_idx ON pokemon_forms (pokemon_id);
+
+CREATE TABLE pokemon_form_names (
+    form_id integer NOT NULL REFERENCES pokemon_forms (id) ON DELETE CASCADE,
+    language_id integer NOT NULL REFERENCES languages (id) ON DELETE CASCADE,
+    form_name text NULL,
+    pokemon_name text NULL
 );
 
 ------------------
@@ -140,14 +163,11 @@ CREATE TABLE caught_pokemon (
     iv_spd smallint NOT NULL,
     iv_total smallint GENERATED ALWAYS AS (iv_hp + iv_atk + iv_defn + iv_satk + iv_sdef + iv_spd) STORED,
     nickname text NULL,
-    favorite boolean NOT NULL DEFAULT FALSE
+    favorite boolean NOT NULL DEFAULT FALSE,
+    user_id bigint NOT NULL REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE user_caught_pokemon (
-    user_id bigint NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    caught_pokemon_id integer REFERENCES caught_pokemon (id),
-    PRIMARY KEY (user_id, caught_pokemon_id)
-);
+CREATE INDEX caught_pokemon_user_id_idx ON caught_pokemon (user_id);
 
 ALTER TABLE users
     ADD COLUMN selected_pokemon_id integer NULL REFERENCES caught_pokemon (id) ON DELETE SET NULL;
