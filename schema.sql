@@ -8,8 +8,8 @@ CREATE TYPE pokemon_evolution_time_of_day AS ENUM (
 
 CREATE TABLE languages (
     id integer PRIMARY KEY NOT NULL,
-    iso639 integer NOT NULL,
-    iso3166 integer NOT NULL,
+    iso639 text NOT NULL,
+    iso3166 text NOT NULL,
     identifier text NOT NULL,
     official boolean NOT NULL
 );
@@ -26,7 +26,7 @@ CREATE TABLE pokemon_species_names (
     species_id integer NOT NULL REFERENCES pokemon_species (id) ON DELETE CASCADE,
     language_id integer NOT NULL REFERENCES languages (id) ON DELETE CASCADE,
     name text NOT NULL,
-    genus text NOT NULL,
+    genus text NULL,
     PRIMARY KEY (species_id, language_id)
 );
 
@@ -132,7 +132,8 @@ CREATE TABLE pokemon_form_names (
     form_id integer NOT NULL REFERENCES pokemon_forms (id) ON DELETE CASCADE,
     language_id integer NOT NULL REFERENCES languages (id) ON DELETE CASCADE,
     form_name text NULL,
-    pokemon_name text NULL
+    pokemon_name text NULL,
+    PRIMARY KEY (form_id, language_id)
 );
 
 ------------------
