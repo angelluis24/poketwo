@@ -10,8 +10,8 @@ import config
 import helpers
 
 DEFAULT_DISABLED_MESSAGE = (
-    "The bot's currently disabled. It may be refreshing for some quick updates, or down for another reason. "
-    "Try again later and check the #status channel in the official server for more details."
+    "El bot está actualmente deshabilitado. Puede ser refrescante para algunas actualizaciones rápidas o no funcionar por otro motivo".
+    "Vuelve a intentarlo más tarde y consulta el canal #status en el servidor oficial para obtener más detalles".
 )
 
 
