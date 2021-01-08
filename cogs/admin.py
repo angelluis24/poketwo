@@ -9,7 +9,7 @@ from . import mongo
 
 
 class Administration(commands.Cog):
-    """Commands for bot administration."""
+    """Comandos del bot administrador."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -73,7 +73,7 @@ class Administration(commands.Cog):
     @commands.is_owner()
     @admin.command(aliases=("addredeem", "ar", "gr"))
     async def giveredeem(self, ctx, user: FetchUserConverter, num: int = 1):
-        """Give a redeem."""
+        """dar un canje."""
 
         await self.bot.mongo.update_member(user, {"$inc": {"redeems": num}})
         await ctx.send(f"Gave **{user}** {num} redeems.")
@@ -81,7 +81,7 @@ class Administration(commands.Cog):
     @commands.is_owner()
     @admin.command(aliases=("givecoins", "ac", "gc"))
     async def addcoins(self, ctx, user: FetchUserConverter, amt: int):
-        """Add to a user's balance."""
+        """añadir el balance del usuario."""
 
         await self.bot.mongo.update_member(user, {"$inc": {"balance": amt}})
         await ctx.send(f"Gave **{user}** {amt} Pokécoins.")
@@ -89,7 +89,7 @@ class Administration(commands.Cog):
     @commands.is_owner()
     @admin.command(aliases=("giveshard", "as", "gs"))
     async def addshard(self, ctx, user: FetchUserConverter, amt: int):
-        """Add to a user's shard balance."""
+        """añadir el balance del usuario."""
 
         await self.bot.mongo.update_member(user, {"$inc": {"premium_balance": amt}})
         await ctx.send(f"Gave **{user}** {amt} shards.")
@@ -97,7 +97,7 @@ class Administration(commands.Cog):
     @commands.is_owner()
     @admin.command(aliases=("givevote", "av", "gv"))
     async def addvote(self, ctx, user: FetchUserConverter, amt: int = 1):
-        """Add to a user's vote streak."""
+        """agrrgar a la racha de votos de un usuario."""
 
         await self.bot.mongo.update_member(
             user,
@@ -110,12 +110,12 @@ class Administration(commands.Cog):
         await ctx.send(f"Increased vote streak by {amt} for **{user}**.")
 
     @commands.is_owner()
-    @admin.command(aliases=("givebox", "ab", "gb"))
+    @admin.command(aliases=("caja de regalo", "cr", "co"))
     async def addbox(self, ctx, user: FetchUserConverter, box_type, amt: int = 1):
-        """Give a user boxes."""
+        """dar un buzon de usuario."""
 
-        if box_type not in ("normal", "great", "ultra", "master"):
-            return await ctx.send("That's not a valid box type!")
+        if box_type not in ("normal", "estupendo", "ultra", "maestro"):
+            return await ctx.send("Ese no es un tipo de caja valido!")
 
         await self.bot.mongo.update_member(
             user,
@@ -133,7 +133,7 @@ class Administration(commands.Cog):
     @commands.is_owner()
     @admin.command(aliases=("g",))
     async def give(self, ctx, user: FetchUserConverter, *, arg: str):
-        """Give a pokémon."""
+        """Regaladr un pokemon."""
 
         shiny = False
 
